@@ -7,7 +7,8 @@
       inputRows = document.getElementsByClassName('guess'),
       hintContainer = document.getElementsByClassName('hint'),
       secretSockets = document.getElementsByClassName('secret socket'),
-      gameStateMessage = document.getElementById('gameStateMessage'),
+      modalOverlay = document.getElementById('modalOverlay'),
+      modalMessage = document.getElementById('modalMessage'),
       rowIncrement = 1,
       hintIncrement = 1,
       pegs = {
@@ -21,15 +22,13 @@
 
   function gameSetup () {
     generateSecretCode(1, 7);
-    
+
     // Add event listener to every code option button
     for (var i = 0; i < options.length; i++)
       options[i].addEventListener('click', insertGuess, false);
 
     document.getElementById('newGame').onclick = newGame;
     document.getElementById('delete').onclick = deleteLast;
-
-    console.log(code);
   }
 
   function insertGuess () {
@@ -57,7 +56,6 @@
 
     // First check if there are any pegs that are the right color in the right place
     for (var i = 0; i < code.length; i++) {
-      console.log(guess[i] + ' vs ' + code[i] + ' is ' + (guess[i] === code[i]));
       if (guess[i] === code[i]) {
         insertPeg('hit');
         codeCopy[i] = 0;
@@ -68,7 +66,6 @@
 
     // Then check if there are any pegs that are the right color but NOT in the right place
     for (var j = 0; j < code.length; j++) {
-      console.log('index of: ' + guess[j] + ' is ' + codeCopy.indexOf(guess[j]));
       if (codeCopy.indexOf(guess[j]) !== -1) {
         insertPeg('almost');
         codeCopy[codeCopy.indexOf(guess[j])] = 0;
@@ -99,8 +96,12 @@
     clearBoard();
     rowIncrement = 1;  // Set the first row of sockets as available for guesses
     hintIncrement = 1; // Set the first row of sockets as available for hints
-    gameStateMessage.style.display = 'none';
+    hideModal();
     gameSetup();           // Prepare the game
+  }
+
+  function hideModal () {
+    modalOverlay.className = '';
   }
 
   function clearBoard () {
@@ -156,12 +157,16 @@
   function gameState (state) {
     gameOver();
     document.getElementsByTagName('body')[0].className = state;
-    gameStateMessage.style.display = 'block';
+    modalOverlay.className = state;
 
-    if (state === 'won')
-      gameStateMessage.innerHTML = 'You cracked the code!';
-    else
-      gameStateMessage.innerHTML = '<h2>Game over</h2><p>You failed! Shame on you...</p>';
+    if (state === 'won') {
+      modalMessage.innerHTML = '<h2>You cracked the code!</h2> <p>Great! You are awesome! You should feel good now...</p> <button class="large" id="hideModal">OK</button> <button id="restartGame" class="large primary">Restart</button>';
+      document.getElementById('restartGame').onclick = newGame;
+      document.getElementById('hideModal').onclick = hideModal;
+    } else
+      modalMessage.innerHTML = '<h2>You failed...</h2> <p>What a shame... Look on the bright side - you weren\'t even close.</p> <button class="large" id="hideModal">OK</button> <button id="restartGame" class="large primary">Restart</button>';
+      document.getElementById('restartGame').onclick = newGame;
+      document.getElementById('hideModal').onclick = hideModal;
   }
 
   gameSetup(); // Run the game
