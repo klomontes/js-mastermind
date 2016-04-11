@@ -143,7 +143,6 @@ hr {
 }
 
 .container {
-  display: inline-block;
   width: 400px;
   margin: 0 auto;
   position: relative;
@@ -411,7 +410,7 @@ button.primary {
 }
 
 #instructions {
-  display: inline-block;
+  display: none;
   width: 400px;
   vertical-align: top;
 }
